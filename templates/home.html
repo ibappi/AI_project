@@ -1,0 +1,312 @@
+{% extends "base.html" %}
+{% block content %}
+
+<!-- Hero Section -->
+<div class="row my-4">
+    <div class="col-md-12 text-center">
+        <div class="hero bg-light p-5 rounded">
+            <h1 class="display-4 font-weight-bold text-dark">Welcome to Solar Power Prediction</h1>
+            <p class="lead text-muted">Harness the power of the sun with our AI-driven predictions.</p>
+            <a href="{{ url_for('input_page') }}" class="btn btn-success btn-lg">
+                <i class="fas fa-sun mr-2"></i> Start Your Prediction
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Row for Data Overview Graphs -->
+<div class="row my-4">
+    <!-- Solar Generation over Time Graph -->
+    <div class="col-md-12">
+        <div class="card mb-4">
+            <div class="card-body">
+                <h5 class="card-title">Solar Power Generation</h5>
+                <canvas id="generationChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sensor Data Comparison Graph -->
+    <div class="col-md-12">
+        <div class="card mb-4">
+            <div class="card-body">
+                <h5 class="card-title">Sensor Data Overview</h5>
+                <canvas id="sensorChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Row for Dollar Savings Visualization -->
+<div class="row my-4">
+    <div class="col-md-6">
+        <div class="card mb-4">
+            <div class="card-body">
+                <h5 class="card-title">Cost Savings from Solar Power</h5>
+                <canvas id="savingsChart" height="200"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Season Data Comparison Graph -->
+    <div class="col-md-6">
+        <div class="card mb-4">
+            <div class="card-body">
+                <h5 class="card-title">Season Data Overview</h5>
+                <canvas id="seasonChart" height="300"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Row for Logs Table -->
+<div class="row my-4">
+    <div class="col-md-12">
+        <div class="card mb-4">
+            <div class="card-body">
+                <h5 class="card-title">Logs Overview</h5>
+                <table class="table table-striped" id="logsTable">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Action</th>
+                            <th>Status</th>
+                            <th>Message</th>
+                            <th>Timestamp</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Rows will be dynamically added by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row my-4">
+    <!-- About Section -->
+    <div class="col-md-6">
+        <div class="card shadow-sm border-0 bg-light h-100">
+            <div class="card-body text-center">
+                <h5 class="card-title">Why Choose Us?</h5>
+                <p class="card-text">We leverage advanced AI technology to provide precise solar generation predictions, helping you maximize your energy savings and efficiency.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Testimonials Section -->
+    <div class="col-md-6">
+        <div class="card bg-light h-100">
+            <div class="card-body text-center">
+                <h5 class="card-title">What Our Users Say</h5>
+                <blockquote class="blockquote">
+                    <p class="mb-0">"This app transformed the way I manage my solar energy!"</p>
+                    <footer class="blockquote-footer">John Doe, Solar Enthusiast</footer>
+                </blockquote>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Footer Section -->
+<footer class="footer mt-4 py-3 bg-dark text-light">
+    <div class="container">
+        <div class="row">
+            <!-- About Links -->
+            <div class="col-md-4 mb-3">
+                <h5>About Us</h5>
+                <p>Your trusted source for solar power prediction and analysis.</p>
+            </div>
+            <!-- Navigation Links -->
+            <div class="col-md-4 mb-3">
+                <h5>Quick Links</h5>
+                <ul class="list-unstyled">
+                    <li><a href="#" class="text-light">Home</a></li>
+                    <li><a href="#" class="text-light">Contact</a></li>
+                    <li><a href="#" class="text-light">Privacy Policy</a></li>
+                </ul>
+            </div>
+            <!-- Social Media Links -->
+            <div class="col-md-4 mb-3 text-center">
+                <h5>Follow Us</h5>
+                <a href="#" class="text-light me-3"><i class="fab fa-facebook-f"></i></a>
+                <a href="#" class="text-light me-3"><i class="fab fa-twitter"></i></a>
+                <a href="#" class="text-light me-3"><i class="fab fa-linkedin-in"></i></a>
+                <a href="#" class="text-light"><i class="fab fa-instagram"></i></a>
+            </div>
+        </div>
+        <!-- Copyright Section -->
+        <div class="text-center mt-3">
+            <small>&copy; 2024 Solar Power Prediction. All Rights Reserved.</small>
+        </div>
+    </div>
+</footer>
+
+<!-- Add Chart.js Script -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+   // Monthly Solar Power Generation for Two Years in kWh
+const generationCtx = document.getElementById('generationChart').getContext('2d');
+new Chart(generationCtx, {
+    type: 'line',
+    data: {
+        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'], // Months
+        datasets: [
+            {
+                label: 'Year 1 (2022)',
+                data: [180, 210, 320, 420, 540, 610, 640, 620, 520, 400, 290, 200], // Year 1 data
+                borderColor: 'rgb(240,174,178)', // Line color for Year 1
+                backgroundColor: 'rgba(240,174,178,0.3)', // Light fill for Year 1
+                fill: true,
+                tension: 0.4
+            },
+            {
+                label: 'Year 2 (2023)',
+                data: [190, 220, 330, 430, 550, 620, 650, 630, 530, 410, 300, 210], // Year 2 data
+                borderColor: 'rgb(78,121,167)', // Line color for Year 2
+                backgroundColor: 'rgba(78,121,167,0.3)', // Light fill for Year 2
+                fill: true,
+                tension: 0.4
+            }
+        ]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            title: {
+                display: true,
+                text: 'Monthly Solar Power Generation Comparison (2022 vs. 2023)'
+            },
+            tooltip: {
+                callbacks: {
+                    label: function(context) {
+                        return `${context.dataset.label}: ${context.raw} kWh`;
+                    }
+                }
+            },
+            legend: {
+                display: true,
+                position: 'top'
+            }
+        },
+        scales: {
+            x: {
+                title: {
+                    display: true,
+                    text: 'Month'
+                }
+            },
+            y: {
+                title: {
+                    display: true,
+                    text: 'kWh Generated'
+                },
+                min: 0
+            }
+        }
+    }
+});
+
+    // Average Daily Sensor Readings (realistic ranges for a solar farm)
+    const sensorCtx = document.getElementById('sensorChart').getContext('2d');
+    new Chart(sensorCtx, {
+        type: 'bar',
+        data: {
+            labels: ['Temperature (°C)', 'Humidity (%)', 'Wind Speed (m/s)', 'Cloud Cover (%)', 'Air Pressure (hPa)', 'Ground Temperature (°C)'],
+            datasets: [{
+                label: 'Sensor Values',
+                data: [28, 79, 4.5, 20, 1012, 26],  // Example realistic average values for each sensor type
+                backgroundColor: 'rgb(232,191,112)'
+            }]
+        },
+        options: { responsive: true }
+    });
+
+    // Solar Generation by Season in MWh
+    const seasonCtx = document.getElementById('seasonChart').getContext('2d');
+    new Chart(seasonCtx, {
+        type: 'bar',
+        data: {
+            labels: ['Spring', 'Summer', 'Fall', 'Winter'],
+            datasets: [{
+                label: 'Energy Generation (MWh)',
+                data: [300, 550, 250, 150],  // Higher production in summer due to longer daylight
+                backgroundColor: 'rgb(167,189,255)'
+            }]
+        },
+        options: { responsive: true }
+    });
+
+    // Solar Power Savings Analysis (Realistic Cost Savings)
+    const savingsCtx = document.getElementById('savingsChart').getContext('2d');
+    new Chart(savingsCtx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Cost Savings', 'Expenditures'],
+            datasets: [{
+                data: [80, 20],  // Example: 80% of cost saved on electricity bills, 20% expenditures for maintenance, etc.
+                backgroundColor: ['rgb(88,205,189)', 'rgb(251,98,61)']
+            }]
+        },
+        options: { responsive: true }
+    });
+
+    // Function to get the current timestamp
+function getCurrentTimestamp() {
+    const now = new Date();
+    return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+}
+
+// Function to generate dummy logs
+function generateDummyLogs() {
+    const logs = [
+        { id: 1, action: 'Prediction', status: 'Success', message: 'Prediction completed', timestamp: '2024-11-01 10:00' },
+        { id: 2, action: 'Input', status: 'Success', message: 'User input saved', timestamp: '2024-11-01 10:05' },
+        { id: 3, action: 'Prediction', status: 'Failure', message: 'Missing input fields', timestamp: '2024-11-01 10:10' },
+        { id: 4, action: 'Database', status: 'Success', message: 'Data saved', timestamp: '2024-11-01 10:15' },
+        { id: 5, action: 'Prediction', status: 'Success', message: 'Results generated', timestamp: '2024-11-01 10:20' },
+        { id: 6, action: 'Input', status: 'Failure', message: 'Invalid values', timestamp: '2024-11-01 10:25' },
+        { id: 7, action: 'Prediction', status: 'Success', message: 'Forecast completed', timestamp: '2024-11-01 10:30' },
+        { id: 8, action: 'Update', status: 'Success', message: 'User data updated', timestamp: '2024-11-01 10:35' },
+        { id: 9, action: 'Prediction', status: 'Success', message: 'Prediction successful', timestamp: '2024-11-26 14:40' }
+    ];
+
+    // Check if a success log exists in localStorage
+    const successLog = JSON.parse(localStorage.getItem('successLog'));
+
+    if (successLog) {
+        // Add the latest success log to the beginning of the logs array
+        logs.unshift(successLog);
+    }
+
+    // Populate the logs table
+    const logsTable = document.getElementById('logsTable').getElementsByTagName('tbody')[0];
+    logs.slice(0, 10).forEach(log => {
+        const row = logsTable.insertRow();
+        row.innerHTML = `<td>${log.id}</td>
+                         <td>${log.action}</td>
+                         <td>${log.status}</td>
+                         <td>${log.message}</td>
+                         <td>${log.timestamp}</td>`;
+    });
+}
+
+// Function to save the latest success log (called from the input page)
+function saveSuccessLog() {
+    const successLog = {
+        id: 10, // Unique ID for the new log
+        action: 'Prediction',
+        status: 'Success',
+        message: 'Prediction successful',
+        timestamp: getCurrentTimestamp()
+    };
+    localStorage.setItem('successLog', JSON.stringify(successLog));
+}
+
+// Generate logs on page load
+window.onload = generateDummyLogs;
+</script>
+
+{% endblock %}

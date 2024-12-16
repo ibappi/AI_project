@@ -1,0 +1,99 @@
+<!-- templates/result.html -->
+{% extends "base.html" %}
+{% block content %}
+<div class="container my-4">
+    <h2>Prediction Result</h2>
+    <div class="card">
+        <div class="card-body">
+            <p class="card-text">Predicted Power Output for {{ results['Day'] | length }} day(s):</p>
+            <canvas id="predictionChart"></canvas>
+            <a href="{{ url_for('input_page') }}" class="btn btn-primary mt-4">Try Another Prediction</a>
+        </div>
+    </div>
+</div>
+
+<!-- Footer Section -->
+<footer class="footer mt-4 py-3 bg-dark text-light">
+    <div class="container">
+        <div class="row">
+            <!-- About Links -->
+            <div class="col-md-4 mb-3">
+                <h5>About Us</h5>
+                <p>Your trusted source for solar power prediction and analysis.</p>
+            </div>
+            <!-- Navigation Links -->
+            <div class="col-md-4 mb-3">
+                <h5>Quick Links</h5>
+                <ul class="list-unstyled">
+                    <li><a href="#" class="text-light">Home</a></li>
+                    <li><a href="#" class="text-light">Contact</a></li>
+                    <li><a href="#" class="text-light">Privacy Policy</a></li>
+                </ul>
+            </div>
+            <!-- Social Media Links -->
+            <div class="col-md-4 mb-3 text-center">
+                <h5>Follow Us</h5>
+                <a href="#" class="text-light me-3"><i class="fab fa-facebook-f"></i></a>
+                <a href="#" class="text-light me-3"><i class="fab fa-twitter"></i></a>
+                <a href="#" class="text-light me-3"><i class="fab fa-linkedin-in"></i></a>
+                <a href="#" class="text-light"><i class="fab fa-instagram"></i></a>
+            </div>
+        </div>
+        <!-- Copyright Section -->
+        <div class="text-center mt-3">
+            <small>&copy; 2024 Solar Power Prediction. All Rights Reserved.</small>
+        </div>
+    </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Chart.js to render predictions
+    const ctx = document.getElementById('predictionChart').getContext('2d');
+    const chartData = {{ results | tojson }};  // Results passed from Flask
+    const predictedValues = chartData['Predicted Generation (Wh)'];  // Y-axis: Predicted values
+
+    let labels = [];  // X-axis labels (will be dynamically set)
+    let xAxisTitle = "";  // Variable to store the x-axis title
+
+    // Check if the data is hourly or daily based on the presence of 'Hour' or 'Day'
+    if (chartData['Hour']) {
+        labels = chartData['Hour'];  // Hourly labels for 1-5 days
+        xAxisTitle = "Hour";  // Set x-axis title to "Hour"
+    } else if (chartData['Day']) {
+        labels = chartData['Day'];  // Daily labels for >5 days
+        xAxisTitle = "Day";  // Set x-axis title to "Day"
+    }
+
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,  // Use dynamic labels (hourly or daily)
+            datasets: [{
+                label: 'Predicted Generation (Wh)',
+                data: predictedValues,  // Hourly or daily data
+                borderColor: '#ff5733',
+                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                x: {
+                    title: {
+                        display: true,
+                        text: xAxisTitle  // Set axis title dynamically
+                    }
+                },
+                y: {
+                    title: {
+                        display: true,
+                        text: 'Power Generation (Wh)'
+                    }
+                }
+            }
+        }
+    });
+</script>
+{% endblock %}

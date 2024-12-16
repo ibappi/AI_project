@@ -1,0 +1,190 @@
+<!-- templates/input.html -->
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-4">
+    <h2>Input Solar Parameters to Predict Power Generation</h2>
+    <div class="row">
+        <!-- Input form on the left -->
+        <div class="col-md-6">
+            <form action="{{ url_for('predict_input') }}" method="POST" class="mt-3">
+                <!-- Existing Input Fields -->
+                <div class="form-group">
+                    <label for="temperature">Temperature (°C):</label>
+                    <input type="text" class="form-control" id="temperature" name="temperature" required>
+                </div>
+                <div class="form-group">
+                    <label for="windspeed">Wind Speed (m/s):</label>
+                    <input type="text" class="form-control" id="windspeed" name="windspeed" required>
+                </div>
+                <div class="form-group">
+                    <label for="winddirection">Wind Direction (°):</label>
+                    <input type="text" class="form-control" id="winddirection" name="winddirection" required>
+                </div>
+                <div class="form-group">
+                    <label for="humidity">Humidity (%):</label>
+                    <input type="text" class="form-control" id="humidity" name="humidity" required>
+                </div>
+                <div class="form-group">
+                    <label for="airpressure">Air Pressure (hPa):</label>
+                    <input type="text" class="form-control" id="airpressure" name="airpressure" required>
+                </div>
+                <div class="form-group">
+                    <label for="amountofcloud">Amount of Cloud:</label>
+                    <input type="text" class="form-control" id="amountofcloud" name="amountofcloud" required>
+                </div>
+                <div class="form-group">
+                    <label for="groundtemperature">Ground Temperature (°C):</label>
+                    <input type="text" class="form-control" id="groundtemperature" name="groundtemperature" required>
+                </div>
+
+                <!-- Dropdown for Prediction Time -->
+                <div class="form-group">
+                    <label for="prediction-time">Select Prediction Time:</label>
+                    <select class="form-control" id="prediction-time" name="prediction_time" required>
+                        <option value="">Choose...</option>
+                        <option value="1_day">1 Day</option>
+                        <option value="2_days">2 Days</option>
+                        <option value="3_days">3 Days</option>
+                        <option value="5_days">5 Days</option>
+                        <option value="1_week">1 Week</option>
+                        <option value="2_weeks">2 Weeks</option>
+                        <option value="1_month">1 Month</option>
+                        <option value="2_months">2 Months</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="btn btn-primary mt-3">Predict</button>
+            </form>
+        </div>
+
+        <!-- Map Section -->
+        <div class="col-md-6">
+            <div id="map" style="height: 400px;"></div>
+            <button class="btn btn-secondary mt-3" onclick="getLocation()">Get Current Location</button>
+        </div>
+    </div>
+</div>
+
+<!-- Footer Section -->
+<footer class="footer mt-4 py-3 bg-dark text-light">
+    <div class="container">
+        <div class="row">
+            <!-- About Links -->
+            <div class="col-md-4 mb-3">
+                <h5>About Us</h5>
+                <p>Your trusted source for solar power prediction and analysis.</p>
+            </div>
+            <!-- Navigation Links -->
+            <div class="col-md-4 mb-3">
+                <h5>Quick Links</h5>
+                <ul class="list-unstyled">
+                    <li><a href="#" class="text-light">Home</a></li>
+                    <li><a href="#" class="text-light">Contact</a></li>
+                    <li><a href="#" class="text-light">Privacy Policy</a></li>
+                </ul>
+            </div>
+            <!-- Social Media Links -->
+            <div class="col-md-4 mb-3 text-center">
+                <h5>Follow Us</h5>
+                <a href="#" class="text-light me-3"><i class="fab fa-facebook-f"></i></a>
+                <a href="#" class="text-light me-3"><i class="fab fa-twitter"></i></a>
+                <a href="#" class="text-light me-3"><i class="fab fa-linkedin-in"></i></a>
+                <a href="#" class="text-light"><i class="fab fa-instagram"></i></a>
+            </div>
+        </div>
+        <!-- Copyright Section -->
+        <div class="text-center mt-3">
+            <small>&copy; 2024 Solar Power Prediction. All Rights Reserved.</small>
+        </div>
+    </div>
+</footer>
+
+<!-- Leaflet CSS and JS -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+<script>
+    // Initialize the map
+    const map = L.map('map').setView([51.505, -0.09], 2); // Default view to London
+
+    // Add OpenStreetMap tile layer
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '© OpenStreetMap'
+    }).addTo(map);
+
+    // Function to get the current location
+    function getLocation() {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(showPosition, showError);
+        } else {
+            alert("Geolocation is not supported by this browser.");
+        }
+    }
+
+    function showPosition(position) {
+        const lat = position.coords.latitude;
+        const lon = position.coords.longitude;
+        map.setView([lat, lon], 13); // Set map view to current location
+        getCityNameAndDisplayData(lat, lon); // Display city name and demo data
+    }
+
+    function showError(error) {
+        switch(error.code) {
+            case error.PERMISSION_DENIED:
+                alert("User denied the request for Geolocation.");
+                break;
+            case error.POSITION_UNAVAILABLE:
+                alert("Location information is unavailable.");
+                break;
+            case error.TIMEOUT:
+                alert("The request to get user location timed out.");
+                break;
+            case error.UNKNOWN_ERROR:
+                alert("An unknown error occurred.");
+                break;
+        }
+    }
+
+    // Function to get city name and display all example data
+    function getCityNameAndDisplayData(lat, lon) {
+        const url = `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`;
+
+        fetch(url)
+            .then(response => response.json())
+            .then(data => {
+                // Get city name from the response
+                const cityName = data.address.city || data.address.town || data.address.village || "Unknown Location";
+
+                // Generate demo data values
+                const demoData = {
+                    temperature: `${Math.floor(Math.random() * (35 - 15 + 1)) + 15} °C`,
+                    windspeed: `${Math.floor(Math.random() * (15 - 3 + 1)) + 3} m/s`,
+                    winddirection: `${Math.floor(Math.random() * 360)}°`,
+                    humidity: `${Math.floor(Math.random() * (90 - 40 + 1)) + 40}%`,
+                    airpressure: `${Math.floor(Math.random() * (1050 - 980 + 1)) + 980} hPa`,
+                    amountofcloud: `${Math.floor(Math.random() * 100)}%`,
+                    groundtemperature: `${Math.floor(Math.random() * (35 - 15 + 1)) + 15} °C`
+                };
+
+                // Add a marker at the current location with the city name and demo data
+                L.marker([lat, lon]).addTo(map)
+                    .bindPopup(`
+                        <strong>Location Data:</strong><br>
+                        <strong>${cityName}</strong><br>
+                        Temperature: ${demoData.temperature}<br>
+                        Wind Speed: ${demoData.windspeed}<br>
+                        Wind Direction: ${demoData.winddirection}<br>
+                        Humidity: ${demoData.humidity}<br>
+                        Air Pressure: ${demoData.airpressure}<br>
+                        Amount of Cloud: ${demoData.amountofcloud}<br>
+                        Ground Temperature: ${demoData.groundtemperature}
+                    `).openPopup();
+            })
+            .catch(error => {
+                console.error('Error fetching city name:', error);
+            });
+    }
+</script>
+
+{% endblock %}

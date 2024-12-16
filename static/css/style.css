@@ -1,0 +1,38 @@
+body {
+    background-color: #eef5ff;
+}
+
+.navbar-brand img {
+    margin-right: 20px;
+}
+
+.jumbotron {
+    background-color: #f0f8ff;
+}
+
+.card {
+    margin-top: 10px;
+}
+
+.footer {
+    background-color: #2b523d; /* Matches your button color */
+    color: #ebffe1; /* Light text color for better readability */
+}
+
+.footer h5 {
+    color: #ebffe1;
+}
+
+.footer a {
+    color: #ebffe1;
+    transition: color 0.3s;
+}
+
+.footer a:hover {
+    color: #9acd89;
+}
+
+.footer .fab {
+    font-size: 1.2rem;
+}
+
